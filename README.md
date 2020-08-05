@@ -8,6 +8,6 @@ To determine the popularity of programming languages on the internet we want to 
     Google winner: .net
     MSN Search winner: java
     Total winner: .net
-•             The application should be able to receive a variable amount of words
-•             The application should support quotation marks to allow searching for terms with spaces (e.g. searchfight.exe “java script”)
-•             The application should support at least two search engines
+    The application should be able to receive a variable amount of words
+    The application should support quotation marks to allow searching for terms with spaces (e.g. searchfight.exe “java script”)
+    The application should support at least two search engines
