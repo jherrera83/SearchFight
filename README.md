@@ -2,7 +2,7 @@ Programming Challenge:
 
 Searchfight
 To determine the popularity of programming languages on the internet we want to you to write an application that queries search engines and compares how many results they return, for example:
-    C:\> searchfight.exe .net java
+    C:\> searchfight.exe .net java<br>
     .net: Google: 4450000000 MSN Search: 12354420
     java: Google: 966000000 MSN Search: 94381485
     Google winner: .net
