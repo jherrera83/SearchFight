@@ -1,10 +1,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SearchFight.Core.Extensions;
 using SearchFight.Core.Interfaces;
-using SearchFight.Core.Services;
-using SearchFight.Infraestructure.Interfaces;
-using SearchFight.Infraestructure.Options;
-using SearchFight.Infraestructure.Repositories;
 using System.IO;
 using System.Threading.Tasks;
 using Xunit;
@@ -105,13 +102,10 @@ namespace SearchFight.Tests
             services.AddSingleton(config);
 
             //get parameters from appsetting.json
-            services.Configure<ConfigurationGoogleOptions>(config.GetSection("ConfigurationGoogleOptions"));
-            services.Configure<ConfigurationBingOptions>(config.GetSection("ConfigurationBingOptions"));
+            services.AddOptions(config);
 
             //dependency injection container
-            services.AddTransient<IGoogleRepository, GoogleRepository>();
-            services.AddTransient<IBingRepository, BingRepository>();
-            services.AddTransient<IEngineService, EngineService>();
+            services.AddServices();
 
             services.AddTransient<SearchFightTest>();
 

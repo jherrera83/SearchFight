@@ -1,26 +1,23 @@
 ﻿using SearchFight.Core.DTOs;
-using SearchFight.Core.Enumerations;
 using SearchFight.Core.Interfaces;
-using SearchFight.Infraestructure.Interfaces;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SearchFight.Core.Services
 {
     public class EngineService : IEngineService
     {
-        public readonly IGoogleRepository _googleRepository;
-        public readonly IBingRepository _bingRepository;
+        public readonly IGoogleService _googleService;
+        public readonly IBingService _bingService;
         /// <summary>
         /// EngineService
         /// </summary>
-        /// <param name="googleRepository"></param>
-        public EngineService(IGoogleRepository googleRepository,
-                             IBingRepository bingRepository)
+        /// <param name="googleService"></param>
+        public EngineService(IGoogleService googleService,
+                             IBingService bingService)
         {
-            _googleRepository = googleRepository;
-            _bingRepository = bingRepository;
+            _googleService = googleService;
+            _bingService = bingService;
         }
 
         /// <summary>
@@ -38,12 +35,12 @@ namespace SearchFight.Core.Services
 
                 #region GOOGLE
                 //for every search in google I put dto in result object
-                engineDto.GoogleDto = await GetResultGoogle(keyWord);
+                engineDto.GoogleDto = await _googleService.GetResultGoogle(keyWord);
                 #endregion
 
                 #region BING
                 //for every search in bing I put dto in result object
-                engineDto.BingDto = await GetResultBing(keyWord);
+                engineDto.BingDto = await _bingService.GetResultBing(keyWord);
                 #endregion
 
                 //set keyword in result object
@@ -56,8 +53,8 @@ namespace SearchFight.Core.Services
 
             #region WINNER
             //I find a winner for every search engine
-            result.GoogleWinnerDto = await GetGoogleWinner(searchEngineDtoList);
-            result.BingWinnerDto = await GetBingWinner(searchEngineDtoList);
+            result.GoogleWinnerDto = await _googleService.GetGoogleWinner(searchEngineDtoList);
+            result.BingWinnerDto = await _bingService.GetBingWinner(searchEngineDtoList);
 
             //winner at all
             result.Winner = await GetWinner(result);
@@ -65,97 +62,6 @@ namespace SearchFight.Core.Services
 
             return result;
         }
-
-        #region GOOGLE SUPPORT METHODS
-        /// <summary>
-        /// GetResultGoogle
-        /// </summary>
-        /// <param name="keyWord"></param>
-        /// <returns></returns>
-        private async Task<GoogleDto> GetResultGoogle(string keyWord)
-        {
-            var result = new GoogleDto();
-            var resultGoogleSearch = await _googleRepository.Search(keyWord);
-            if (resultGoogleSearch != null)
-            {
-                result.SearchEngine = EnumEngine.Google.ToString();
-                result.Total = resultGoogleSearch.searchInformation.totalResults;
-            }
-
-            return result;
-        }
-        /// <summary>
-        /// GetGoogleWinner
-        /// </summary>
-        /// <param name="engineDtoList"></param>
-        /// <returns></returns>
-        private async Task<GoogleWinnerDto> GetGoogleWinner(List<SearchEngineDto> engineDtoList)
-        {
-            //create a dicctionary for total and keywork
-            Dictionary<long, string> googleList = new Dictionary<long, string>();
-            foreach (var item in engineDtoList)
-            {
-                googleList.Add(item.GoogleDto.Total, item.KeyWord);
-            }
-
-            //put in descending Order  and take the first
-            var result = googleList.OrderByDescending(p => p.Key).FirstOrDefault();
-
-            //already have google winner
-            return await Task.FromResult(new GoogleWinnerDto
-            {
-                KeyWord = result.Value,
-                Total = result.Key,
-                Result = $"{EnumEngine.Google} {"winner: "} {result.Value}"
-            });
-        }
-        #endregion
-
-        #region BING SUPPORT METHODS
-        /// <summary>
-        /// GetResultBing
-        /// </summary>
-        /// <param name="keyWord"></param>
-        /// <returns></returns>
-        private async Task<BingDto> GetResultBing(string keyWord)
-        {
-            var result = new BingDto();
-            var resultBingSearch = await _bingRepository.Search(keyWord);
-            if (resultBingSearch != null)
-            {
-                result.SearchEngine = EnumEngine.Bing.ToString();
-                result.Total = resultBingSearch.webPages.totalEstimatedMatches;
-            }
-
-            return result;
-        }
-
-        /// <summary>
-        /// GetBingWinner
-        /// </summary>
-        /// <param name="engineDtoList"></param>
-        /// <returns></returns>
-        private async Task<BingWinnerDto> GetBingWinner(List<SearchEngineDto> engineDtoList)
-        {
-            //create a dicctionary for total and keywork
-            Dictionary<long, string> bingList = new Dictionary<long, string>();
-            foreach (var item in engineDtoList)
-            {
-                bingList.Add(item.BingDto.Total, item.KeyWord);
-            }
-
-            //put in descending Order  and take the first
-            var result = bingList.OrderByDescending(p => p.Key).FirstOrDefault();
-
-            //already have google winner
-            return await Task.FromResult(new BingWinnerDto
-            {
-                KeyWord = result.Value,
-                Total = result.Key,
-                Result = $"{EnumEngine.Bing} {"winner: "} {result.Value}"
-            });
-        }
-        #endregion
 
         #region SEARCHFIGHT SUPPORT METHODS
         /// <summary>

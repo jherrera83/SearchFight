@@ -1,10 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using SearchFight.Core.Interfaces;
-using SearchFight.Core.Services;
-using SearchFight.Infraestructure.Interfaces;
-using SearchFight.Infraestructure.Options;
-using SearchFight.Infraestructure.Repositories;
+using SearchFight.Core.Extensions;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -22,7 +18,7 @@ namespace SearchFight
             var services = ConfigureServices();
             var serviceProvider = services.BuildServiceProvider();
 
-            //args = new string[] { ".net", "java" };
+            //args = new string[] {cobol", "java" };
             await serviceProvider.GetService<App>().Run(args);
         }
 
@@ -38,14 +34,11 @@ namespace SearchFight
             services.AddSingleton(config);
 
             //get parameters from appsetting.json
-            services.Configure<ConfigurationGoogleOptions>(config.GetSection("ConfigurationGoogleOptions"));
-            services.Configure<ConfigurationBingOptions>(config.GetSection("ConfigurationBingOptions"));
+            services.AddOptions(config);
 
             //dependency injection container
-            services.AddTransient<IGoogleRepository, GoogleRepository>();
-            services.AddTransient<IBingRepository, BingRepository>();
-            services.AddTransient<IEngineService, EngineService>();
-
+            services.AddServices();
+            
             services.AddTransient<App>();
 
             return services;
